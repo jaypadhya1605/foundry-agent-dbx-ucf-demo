@@ -1,0 +1,69 @@
+client v2 in place
+Account: jaypadhya@microsoft.com	Azure-brakekat
+Registering resource providers (one-time)...
+  Microsoft.ApiManagement registered
+  Microsoft.ManagedIdentity registered
+  Microsoft.OperationalInsights registered
+  Microsoft.Insights registered
+Building Bicep...
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+Deploying (APIM BasicV2 typically takes 5-15 min)...
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+{
+  "apimName": "apim-imh-uc-66zpmtcbvhe7w",
+  "foundryConnectionName": "uc-fn-via-apim-umi-iac",
+  "genieMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/genie/mcp",
+  "logAnalyticsWorkspace": "law-imh-uc-66zpmtcbvhe7w",
+  "mcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc/mcp",
+  "umiClientId": "e983157d-68fc-430a-9ee8-cdf1efe4b68e",
+  "umiName": "umi-imh-uc-agent",
+  "umiPrincipalId": "a256535e-6537-4efd-b633-8e809ce37142"
+}
+DEPLOY-COMPLETE
+=== genie tools ===
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/genie/mcp auth=key
+# initialize: HTTP 200, correlation id f730ce1a-82f5-4819-b268-0ad56f92392a
+# notifications/initialized: HTTP 200, correlation id a1043697-90fb-4d7f-9679-54f0e44ae05b
+# tools/list: HTTP 200, correlation id f9e39fe8-6fcc-486e-827b-d26c658719de
+{
+ "name": "query_space_01f1c5e2508a1326a03ad64e4d7fb1b5",
+ "description": "Query the Patient Clinical Records genie space for data insights.\nYou can ask natural language questions and will receive responses in natural language or as SQL query results.\nYou can ask for a summa",
+ "inputSchema": {
+  "type": "object",
+  "required": [
+   "query"
+  ],
+  "properties": {
+   "query": {
+    "type": "string",
+    "description": "Query for genie space"
+   },
+   "conversation_id": {
+    "type": "string",
+    "description": "Optional conversation ID to continue an existing conversation"
+   }
+  }
+ }
+}
+{
+ "name": "poll_response_01f1c5e2508a1326a03ad64e4d7fb1b5",
+ "description": "Poll for the response of a previously initiated message in the Patient Clinical Records genie space.\nUse this tool to retrieve results for a message that was started but not yet completed.\nRequires bo",
+ "inputSchema": {
+  "type": "object",
+  "required": [
+   "conversation_id",
+   "message_id"
+  ],
+  "properties": {
+   "conversation_id": {
+    "type": "string",
+    "description": "The conversation ID from the genie space"
+   },
+   "message_id": {
+    "type": "string",
+    "description": "The message ID to poll for the response of"
+   }
+  }
+ }
+}
+S1-DONE

@@ -1,0 +1,21 @@
+<policies>
+  <!-- Foundry model API (/aoai): key in api-key header, rate + token limit, APIM signs in to Foundry with the UMI.
+       Tokens: CALLS TPM CLIENT_ID (each wrapped in double underscores) -->
+  <inbound>
+    <base />
+    <rate-limit-by-key calls="__CALLS__" renewal-period="60" counter-key="@(context.Subscription.Id)" />
+    <llm-token-limit counter-key="@(context.Subscription.Id)" tokens-per-minute="__TPM__" estimate-prompt-tokens="false" remaining-tokens-header-name="x-imh-remaining-tokens" />
+    <set-variable name="correlationId" value="@(context.RequestId.ToString())" />
+    <set-header name="api-key" exists-action="delete" />
+    <set-header name="Authorization" exists-action="delete" />
+    <authentication-managed-identity resource="https://cognitiveservices.azure.com" client-id="__CLIENT_ID__" ignore-error="false" />
+  </inbound>
+  <backend><forward-request timeout="120" /></backend>
+  <outbound>
+    <set-header name="x-imh-correlation-id" exists-action="override"><value>@((string)context.Variables["correlationId"])</value></set-header>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

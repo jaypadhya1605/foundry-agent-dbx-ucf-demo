@@ -1,0 +1,65 @@
+=== redeploy main (row cap) ===
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+Deploying (APIM BasicV2 typically takes 5-15 min)...
+{
+  "apimName": "apim-imh-uc-66zpmtcbvhe7w",
+  "entraAudience": "e983157d-68fc-430a-9ee8-cdf1efe4b68e",
+  "entraMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-entra/mcp",
+  "foundryConnectionNames": [
+    "uc-fn-via-apim-umi-iac",
+    "genie-via-apim-umi-iac",
+    "uc-limited-via-apim-umi-iac",
+    ""
+  ],
+  "genieMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/genie/mcp",
+  "limitedMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp",
+  "logAnalyticsWorkspace": "law-imh-uc-66zpmtcbvhe7w",
+  "mcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc/mcp",
+  "modelGatewayUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/aoai",
+  "runtimeUmiClientId": "dbd7f6a1-92a8-470b-a7bd-7bf2f947b6a7",
+  "runtimeUmiName": "umi-imh-uc-runtime",
+  "umiClientId": "e983157d-68fc-430a-9ee8-cdf1efe4b68e",
+  "umiName": "umi-imh-uc-agent",
+  "umiPrincipalId": "a256535e-6537-4efd-b633-8e809ce37142"
+}
+DEPLOY-COMPLETE
+=== runtime deploy (ACA job) ===
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+{
+  "out": {
+    "environmentName": {
+      "type": "String",
+      "value": "cae-imh-uc-runtime"
+    },
+    "jobName": {
+      "type": "String",
+      "value": "job-imh-uc-agent"
+    }
+  },
+  "state": "Succeeded"
+}
+runtime deploy exit 0
+=== /uc-limited tests (after 60s rate window) ===
+--- T1 SLC (4 rows, expect pass) ---
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp auth=key
+# initialize: HTTP 200, correlation id f2bd57d2-c723-4649-821b-2a959ab89510
+# notifications/initialized: HTTP 200, correlation id 6f4e47ab-39cc-4216-a359-e158677ff96c
+# tools/list: HTTP 200, correlation id 284b4fdb-5eb3-40c1-9620-5ada6c56324e
+# tools: ['imh_demo__clinical__get_patients']
+# tools/call: HTTP 200, correlation id 16885590-1ad8-4c97-a37d-d1a4067a14ec
+{"is_truncated":false,"columns":["patient_id","name","ssn","facility","diagnosis"],"rows":[["P001","REDACTED","***-**-1001","SLC","Type 2 diabetes"],["P002","REDACTED","***-**-1002","SLC","Hypertension"],["P003","REDACTED","***-**-1003","SLC","Congestive heart failure"],["P004","REDACTED","***-**-1004","SLC","COPD"]]}
+--- T2 all facilities (12 rows, expect row-limit block) ---
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp auth=key
+# initialize: HTTP 200, correlation id 60e2a14f-749b-4cf5-a48c-8b83f8b25a2f
+# notifications/initialized: HTTP 200, correlation id 54484671-651e-4bd0-a17c-17c61a24c37b
+# tools/list: HTTP 200, correlation id 311667a4-3092-4800-8b94-388da1399cd2
+# tools: ['imh_demo__clinical__get_patients']
+# tools/call: HTTP 200, correlation id d25c6946-3b12-4dc8-aa14-287ba4675662, gateway block: row-limit 12>5
+Blocked by gateway policy: the result has 12 rows (limit 5) or is larger than 20000 bytes. Ask a narrower question, for example one facility.
+=== start ACA job ===
+execution=job-imh-uc-agent-eqny3er
+status=Running
+status=Running
+status=Failed
+S5-DONE

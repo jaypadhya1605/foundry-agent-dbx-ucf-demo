@@ -1,0 +1,77 @@
+<policies>
+  <!-- MCP API, limited: tools/call rate limit, daily quota, row/size cap returned as an MCP tool error.
+       Tokens: TOOLCALLS QUOTA MAXROWS MAXBYTES REWRITE RESOURCE CLIENT_ID (each wrapped in double underscores) -->
+  <inbound>
+    <base />
+    <set-variable name="rpcMethod" value="@{
+      if (context.Request.Method != "POST") { return ""; }
+      var body = context.Request.Body?.As<string>(preserveContent: true);
+      if (string.IsNullOrEmpty(body)) { return ""; }
+      var m = Newtonsoft.Json.Linq.JObject.Parse(body)["method"];
+      return m == null ? "" : m.ToString();
+    }" />
+    <set-variable name="rpcId" value="@{
+      if (context.Request.Method != "POST") { return "null"; }
+      var body = context.Request.Body?.As<string>(preserveContent: true);
+      if (string.IsNullOrEmpty(body)) { return "null"; }
+      var id = Newtonsoft.Json.Linq.JObject.Parse(body)["id"];
+      return id == null ? "null" : id.ToString(Newtonsoft.Json.Formatting.None);
+    }" />
+    <choose>
+      <when condition="@((string)context.Variables["rpcMethod"] == "tools/call")">
+        <rate-limit-by-key calls="__TOOLCALLS__" renewal-period="60" counter-key="@(context.Subscription.Id + "-tools")" />
+      </when>
+    </choose>
+    <quota-by-key calls="__QUOTA__" renewal-period="86400" counter-key="@(context.Subscription.Id)" />
+    <set-variable name="correlationId" value="@(context.RequestId.ToString())" />
+    <set-header name="x-imh-correlation-id" exists-action="override"><value>@((string)context.Variables["correlationId"])</value></set-header>
+    <set-header name="Authorization" exists-action="delete" />
+    <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+    <rewrite-uri template="__REWRITE__" copy-unmatched-params="false" />
+    <authentication-managed-identity resource="__RESOURCE__" client-id="__CLIENT_ID__" ignore-error="false" />
+  </inbound>
+  <backend><forward-request timeout="120" buffer-response="true" /></backend>
+  <outbound>
+    <choose>
+      <when condition="@((string)context.Variables["rpcMethod"] == "tools/call")">
+        <set-variable name="respBody" value="@(context.Response.Body.As<string>(preserveContent: true))" />
+        <set-variable name="rowCount" value="@{
+          try {
+            var body = (string)context.Variables["respBody"];
+            var json = body.Trim();
+            if (!json.StartsWith("{")) {
+              var idx = json.LastIndexOf("data:");
+              if (idx < 0) { return 0; }
+              json = json.Substring(idx + 5).Trim();
+            }
+            var msg = Newtonsoft.Json.Linq.JObject.Parse(json);
+            var text = (string)msg["result"]["content"][0]["text"];
+            var rows = Newtonsoft.Json.Linq.JObject.Parse(text)["rows"] as Newtonsoft.Json.Linq.JArray;
+            return rows == null ? 0 : rows.Count;
+          } catch { return 0; }
+        }" />
+        <set-variable name="blockReason" value="@{
+          if ((int)context.Variables["rowCount"] > __MAXROWS__) { return "rows"; }
+          if (((string)context.Variables["respBody"]).Length > __MAXBYTES__) { return "bytes"; }
+          return "";
+        }" />
+        <choose>
+          <when condition="@((string)context.Variables["blockReason"] != "")">
+            <return-response>
+              <set-status code="200" reason="OK" />
+              <set-header name="Content-Type" exists-action="override"><value>application/json</value></set-header>
+              <set-header name="x-imh-correlation-id" exists-action="override"><value>@((string)context.Variables["correlationId"])</value></set-header>
+              <set-header name="x-imh-gateway-block" exists-action="override"><value>@((string)context.Variables["blockReason"] == "rows" ? "row-limit " + context.Variables["rowCount"] + ">__MAXROWS__" : "response-size")</value></set-header>
+              <set-body>@("{\"jsonrpc\":\"2.0\",\"id\":" + (string)context.Variables["rpcId"] + ",\"result\":{\"isError\":true,\"content\":[{\"type\":\"text\",\"text\":\"Blocked by gateway policy: the result has " + context.Variables["rowCount"] + " rows (limit __MAXROWS__) or is larger than __MAXBYTES__ bytes. Ask a narrower question, for example one facility.\"}]}}")</set-body>
+            </return-response>
+          </when>
+        </choose>
+      </when>
+    </choose>
+    <set-header name="x-imh-correlation-id" exists-action="override"><value>@((string)context.Variables["correlationId"])</value></set-header>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

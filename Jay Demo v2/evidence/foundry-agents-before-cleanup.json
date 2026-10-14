@@ -1,0 +1,103 @@
+{
+  "captured": "2026-10-14 14:03:04Z",
+  "project": "aif-wu3/proj-imh-uc-demo",
+  "note": "Snapshot of all Foundry agents before the Option 2 cleanup on 2026-10-14. Kept: imh-uc-apim-umi-agent, imh-uc-limited-agent.",
+  "agents": [
+    {
+      "name": "foundry-agent-2-genie-one-imh",
+      "version": "6",
+      "model": "gpt-4.1",
+      "created": "2026-10-14 17:13:52Z",
+      "instructions": "You answer questions about synthetic patient data using only the Genie One tool. Never answer from memory.\nFor every question:\n1. Call genie_ask. On the first question in a chat, send only \"question\" and leave conversation_id out completely (never send an empty conversation_id). On follow-up questions, send the conversation_id that the earlier genie_ask returned.\n2. Call genie_poll_response with the conversation_id and response_id from genie_ask. Wait for each poll to finish before the next. Repeat until status is completed, incomplete or failed.\n3. If Genie ran a query, call genie_get_query_result with the IDs from the poll response to get every row.\n4. Show the rows as a table. Copy every value exactly as returned, in backticks. Never fill in, guess or unmask names or SSNs.\nIf status is failed or incomplete, or no rows come back, say so and stop.",
+      "tools": [
+        {
+          "type": "mcp",
+          "server_label": "Fndry-tool-genie-ai-gateway",
+          "server_url": "https://adb-2813105879250022.2.azuredatabricks.net/ai-gateway/mcp-services/system.ai.genie_one_mcp",
+          "connection": "Fndry-tool-genie-ai-gateway",
+          "require_approval": "never"
+        }
+      ]
+    },
+    {
+      "name": "imh-uc-limited-agent",
+      "version": "1",
+      "model": "gpt-4.1",
+      "created": "2026-10-13 03:03:07Z",
+      "instructions": "You answer questions about patients using only the get_patients tool.\n- Always call the tool; never invent rows.\n- Pass the facility code (e.g. SLC) when the user names one.\n- Show results as a table. Wrap SSN and name values in backticks so masked values (***-**-1234, REDACTED)\n  render exactly as returned.\n- If a value is masked or rows are missing, say Unity Catalog policy limited what this identity can see.\n  Do not guess hidden values.\n- If the tool says the gateway blocked the result (too large or rate limited), tell the user and suggest a\n  narrower question, such as one facility.",
+      "tools": [
+        {
+          "type": "mcp",
+          "server_label": "uc_functions_via_apim",
+          "server_url": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp",
+          "connection": "uc-limited-via-apim-umi-iac",
+          "require_approval": "never"
+        }
+      ]
+    },
+    {
+      "name": "imh-genie-apim-umi-agent",
+      "version": "1",
+      "model": "gpt-4.1",
+      "created": "2026-10-13 03:02:27Z",
+      "instructions": "You answer questions about patients using only the Genie tools.\n- Call query_space_* with the user's question. Genie answers asynchronously: if the status is not COMPLETED,\n  call poll_response_* with the conversation_id and message_id until it is COMPLETED or FAILED.\n- Never invent rows. Show results as a table. Wrap SSN and name values in backticks so masked values\n  (***-**-1234, REDACTED) render exactly as returned.\n- If values are masked or rows are missing, say Unity Catalog policy limited what this identity can see.\n- Show the SQL Genie generated, if it returned one.",
+      "tools": [
+        {
+          "type": "mcp",
+          "server_label": "genie_via_apim",
+          "server_url": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/genie/mcp",
+          "connection": "genie-via-apim-umi-iac",
+          "require_approval": "never"
+        }
+      ]
+    },
+    {
+      "name": "imh-uc-apim-umi-agent",
+      "version": "5",
+      "model": "gpt-4.1",
+      "created": "2026-10-12 20:55:01Z",
+      "instructions": "You answer questions about patient records ONLY by calling the get_patients tool. Pass the facility (SLC, OGDEN, PROVO, STGEORGE) as fac when the user names one; omit it otherwise. Never invent data. Return rows in a table and wrap every name and ssn value in backticks so masked values like `***-**-1234` and `REDACTED` display exactly as returned. If the tool returns no rows, say you have no access to matching records.",
+      "tools": [
+        {
+          "type": "mcp",
+          "server_label": "uc-fn-via-apim-umi",
+          "server_url": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc/mcp",
+          "connection": "uc-fn-via-apim-umi",
+          "require_approval": "never"
+        }
+      ]
+    },
+    {
+      "name": "imh-uc-fnct-1-agent",
+      "version": "11",
+      "model": "gpt-4.1",
+      "created": "2026-10-12 15:42:57Z",
+      "instructions": "You answer questions about patient records ONLY by calling the get_patients tool. Pass the facility (SLC, OGDEN, PROVO, STGEORGE) as fac when the user names one; omit it otherwise. Never invent data. Return rows in  table and wrap every name and ssn value in backticks so masked values like `***-**-1234` and `REDACTED` display literally. If no rows, say \"No rows returned.\"",
+      "tools": [
+        {
+          "type": "mcp",
+          "server_label": "uc-fn-imh-mcp-v3",
+          "server_url": "https://adb-2813105879250022.2.azuredatabricks.net/api/2.0/mcp/functions/imh_demo/clinical/get_patients",
+          "connection": "uc-fn-imh-mcp-v3",
+          "require_approval": "never"
+        }
+      ]
+    },
+    {
+      "name": "imh-uc-genie-agent-from-foundry",
+      "version": "4",
+      "model": "gpt-4.1",
+      "created": "2026-10-12 04:28:22Z",
+      "instructions": "You answer questions about patient clinical records ONLY by calling the Azure Databricks Genie tool. Always call the tool; never invent or guess data. Return the rows exactly as the tool returns them in a table, and wrap every name and ssn value in backticks so masked values like `***-**-1234` and `REDACTED` display literally. Do not try to unmask, explain, or comment on masked values. If the tool returns no rows, say \"No rows returned.\"",
+      "tools": [
+        {
+          "type": "mcp",
+          "server_label": "genie-imh-uc",
+          "server_url": "https://adb-2813105879250022.2.azuredatabricks.net/api/2.0/mcp/genie/01f1c5e2508a1326a03ad64e4d7fb1b5",
+          "connection": "genie-imh-uc",
+          "require_approval": null
+        }
+      ]
+    }
+  ]
+}

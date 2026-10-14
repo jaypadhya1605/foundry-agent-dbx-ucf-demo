@@ -1,0 +1,43 @@
+=== runtime redeploy (updated client) ===
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+Succeeded
+execution=job-imh-uc-agent-1ffn4oy
+=== Foundry agents (while job logs ingest) ===
+=== Azure AI User on aif-wu3 for the signed-in user ===
+Foundry User
+role exit 0
+=== venv (outside OneDrive) ===
+pip exit 0
+azure-ai-projects 2.8.0
+=== Genie agent via APIM ===
+agent=imh-genie-apim-umi-agent version=1
+Q: How many patients are there per facility? Show the SQL.
+Here are the patient counts per facility:
+
+| facility   | patient_count |
+|------------|--------------|
+| SLC        | 4            |
+| OGDEN      | 3            |
+| PROVO      | 3            |
+| STGEORGE   | 2            |
+
+SQL used:
+```sql
+SELECT `facility`, COUNT(*) AS `patient_count`
+FROM `imh_demo`.`clinical`.`patients`
+WHERE `facility` IS NOT NULL
+GROUP BY `facility`
+ORDER BY `patient_count` DESC, `facility` ASC;
+```
+Unity Catalog policy limited what this identity can see if you notice missing or masked values.
+=== Limited UC agent via APIM ===
+agent=imh-uc-limited-agent version=1
+Q: Show me all patients across every facility.
+The current request to show all patients across every facility would result in a very large dataset, which may be blocked or rate limited by the gateway.
+
+To ensure a successful response, please narrow your requestùfor example, by specifying a single facility such as SLC, OGDEN, PROVO, or STGEORGE. Would you like to see patients from one of these facilities? If so, please specify which one.
+S6-DONE
+job status=Failed
+=== job console logs ===
+10/13/2026 03:09:01 # managed identity token for e983157d-68fc-430a-9ee8-cdf1efe4b68e failed: HTTP 400 {"exceptionMessage":"AADSTS100040: AppId: \u0027dbd7f6a1-92a8-470b-a7bd-7bf2f947b6a7\u0027 can not use Managed Service Identity (MSI) as audience in token as it is unsupported. MSI should not be set as audience as it does not accept tokens. Trace ID: aa8d5e44-df2b-43fc-b143-e49921ab0301 Correlation ID: b46cbfd2-2ad5-43f7-8cf5-5ade8e87d102 Timestamp: 2026-10-13 03:09:00Z","errorCode":"invalid_request","innerException":null,"statusCode":400,"message":null,"correlationId":"dff0c8a3-038f-4a4b-b565-1b59e18d74e8"}
+S7-DONE

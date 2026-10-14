@@ -1,0 +1,142 @@
+=== build ===
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+WARNING: C:\Users\jaypadhya\OneDrive - Microsoft\Desktop\SE Ops\my-scout\Customer\Intermountain Healthcare\On site -- Foundry and Databricks Session\infra\uc-agent-gateway\azure\bicep\main.bicep(219,110) : Warning BCP329: The provided value can be as small as -1 and may be too small to assign to a target with a configured minimum of 0. [https://aka.ms/bicep/core-diagnostics#BCP329]
+
+
+main build exit 0
+=== deploy main (audience -> ARM) ===
+Account: jaypadhya@microsoft.com	Azure-brakekat
+Registering resource providers (one-time)...
+  Microsoft.ApiManagement registered
+  Microsoft.ManagedIdentity registered
+  Microsoft.OperationalInsights registered
+  Microsoft.Insights registered
+Building Bicep...
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+WARNING: C:\Users\jaypadhya\OneDrive - Microsoft\Desktop\SE Ops\my-scout\Customer\Intermountain Healthcare\On site -- Foundry and Databricks Session\infra\uc-agent-gateway\azure\bicep\main.bicep(219,110) : Warning BCP329: The provided value can be as small as -1 and may be too small to assign to a target with a configured minimum of 0. [https://aka.ms/bicep/core-diagnostics#BCP329]
+
+
+Deploying (APIM BasicV2 typically takes 5-15 min)...
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+WARNING: C:\Users\jaypadhya\OneDrive - Microsoft\Desktop\SE Ops\my-scout\Customer\Intermountain Healthcare\On site -- Foundry and Databricks Session\infra\uc-agent-gateway\azure\bicep\main.bicep(219,110) : Warning BCP329: The provided value can be as small as -1 and may be too small to assign to a target with a configured minimum of 0. [https://aka.ms/bicep/core-diagnostics#BCP329]
+
+
+{
+  "apimName": "apim-imh-uc-66zpmtcbvhe7w",
+  "entraAudience": "https://management.azure.com",
+  "entraMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-entra/mcp",
+  "foundryConnectionNames": [
+    "uc-fn-via-apim-umi-iac",
+    "genie-via-apim-umi-iac",
+    "uc-limited-via-apim-umi-iac",
+    ""
+  ],
+  "genieMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/genie/mcp",
+  "limitedMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp",
+  "logAnalyticsWorkspace": "law-imh-uc-66zpmtcbvhe7w",
+  "mcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc/mcp",
+  "modelGatewayUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/aoai",
+  "runtimeUmiClientId": "dbd7f6a1-92a8-470b-a7bd-7bf2f947b6a7",
+  "runtimeUmiName": "umi-imh-uc-runtime",
+  "umiClientId": "e983157d-68fc-430a-9ee8-cdf1efe4b68e",
+  "umiName": "umi-imh-uc-agent",
+  "umiPrincipalId": "a256535e-6537-4efd-b633-8e809ce37142"
+}
+DEPLOY-COMPLETE
+entraAudience=https://management.azure.com
+=== /uc-entra negative: Jay az cli ARM token (client app not allowed, expect 401) ===
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-entra/mcp auth=azcli
+# gateway refused the request: HTTP 401 Unauthorized: { "statusCode": 401, "message": "A valid Entra token for the UC agent gateway is required." }
+=== runtime job (positive: runtime UMI is allowed) ===
+=== runtime redeploy (updated client) ===
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+ERROR: HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)
+ERROR: The command failed with an unexpected error. Here is the traceback:
+ERROR: HTTPSConnectionPool(host='management.azure.com', port=443): Max retries exceeded with url: /subscriptions/9bbee190-dc61-4c58-ab47-1275cb04018f/resourceGroups/rg-ai/providers/Microsoft.App/jobs/job-imh-uc-agent/start?api-version=2024-03-01 (Caused by NameResolutionError("HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)"))
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connection.py", line 204, in _new_conn
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/util/connection.py", line 60, in create_connection
+  File "socket.py", line 977, in getaddrinfo
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 788, in urlopen
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 488, in _make_request
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 464, in _make_request
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 1106, in _validate_conn
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connection.py", line 759, in connect
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connection.py", line 211, in _new_conn
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\requests/adapters.py", line 645, in send
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 842, in urlopen
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/util/retry.py", line 543, in increment
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='management.azure.com', port=443): Max retries exceeded with url: /subscriptions/9bbee190-dc61-4c58-ab47-1275cb04018f/resourceGroups/rg-ai/providers/Microsoft.App/jobs/job-imh-uc-agent/start?api-version=2024-03-01 (Caused by NameResolutionError("HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\knack/cli.py", line 233, in invoke
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 677, in execute
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 820, in _run_jobs_serially
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 789, in _run_job
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 335, in __call__
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/command_operation.py", line 120, in handler
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/util/custom.py", line 23, in rest_call
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/util.py", line 1089, in send_raw_request
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\requests/sessions.py", line 706, in send
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\requests/adapters.py", line 678, in send
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='management.azure.com', port=443): Max retries exceeded with url: /subscriptions/9bbee190-dc61-4c58-ab47-1275cb04018f/resourceGroups/rg-ai/providers/Microsoft.App/jobs/job-imh-uc-agent/start?api-version=2024-03-01 (Caused by NameResolutionError("HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)"))
+To check existing issues, please visit: https://github.com/Azure/azure-cli/issues
+execution=
+ERROR: The command failed with an unexpected error. Here is the traceback:
+ERROR: HTTPSConnectionPool(host='management.azure.com', port=443): Max retries exceeded with url: /subscriptions/9bbee190-dc61-4c58-ab47-1275cb04018f/resourceGroups/rg-ai/providers/Microsoft.App/jobs/job-imh-uc-agent/executions/?api-version=2024-03-01 (Caused by NameResolutionError("HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)"))
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connection.py", line 204, in _new_conn
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/util/connection.py", line 60, in create_connection
+  File "socket.py", line 977, in getaddrinfo
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 788, in urlopen
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 488, in _make_request
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 464, in _make_request
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 1106, in _validate_conn
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connection.py", line 759, in connect
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connection.py", line 211, in _new_conn
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\requests/adapters.py", line 645, in send
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/connectionpool.py", line 842, in urlopen
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\urllib3/util/retry.py", line 543, in increment
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='management.azure.com', port=443): Max retries exceeded with url: /subscriptions/9bbee190-dc61-4c58-ab47-1275cb04018f/resourceGroups/rg-ai/providers/Microsoft.App/jobs/job-imh-uc-agent/executions/?api-version=2024-03-01 (Caused by NameResolutionError("HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\knack/cli.py", line 233, in invoke
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 677, in execute
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 820, in _run_jobs_serially
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 789, in _run_job
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", line 335, in __call__
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/command_operation.py", line 120, in handler
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/util/custom.py", line 23, in rest_call
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/util.py", line 1089, in send_raw_request
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\requests/sessions.py", line 706, in send
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\requests/adapters.py", line 678, in send
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='management.azure.com', port=443): Max retries exceeded with url: /subscriptions/9bbee190-dc61-4c58-ab47-1275cb04018f/resourceGroups/rg-ai/providers/Microsoft.App/jobs/job-imh-uc-agent/executions/?api-version=2024-03-01 (Caused by NameResolutionError("HTTPSConnection(host='management.azure.com', port=443): Failed to resolve 'management.azure.com' ([Errno 11001] getaddrinfo failed)"))
+To check existing issues, please visit: https://github.com/Azure/azure-cli/issues
+job status=
+=== job console logs ===
+S7-DONE
+S8-DONE

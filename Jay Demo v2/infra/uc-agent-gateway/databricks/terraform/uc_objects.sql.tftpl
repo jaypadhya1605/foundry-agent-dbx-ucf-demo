@@ -1,0 +1,73 @@
+-- UC agent gateway demo objects. SYNTHETIC DATA ONLY. Re-running replaces the demo table.
+-- Rendered by Terraform (templatefile) and run once by the setup job on a SQL warehouse.
+
+USE CATALOG ${catalog};
+USE SCHEMA ${schema};
+
+CREATE OR REPLACE TABLE patients (
+  patient_id STRING,
+  name       STRING,
+  dob        DATE,
+  ssn        STRING,
+  facility   STRING,
+  diagnosis  STRING
+);
+
+INSERT INTO patients VALUES
+  ('P001', 'Avery Synth',   DATE'1961-03-14', '900-01-1001', 'SLC',      'Type 2 diabetes'),
+  ('P002', 'Blake Synth',   DATE'1958-07-22', '900-01-1002', 'SLC',      'Hypertension'),
+  ('P003', 'Casey Synth',   DATE'1949-11-05', '900-01-1003', 'SLC',      'Congestive heart failure'),
+  ('P004', 'Devon Synth',   DATE'1955-01-30', '900-01-1004', 'SLC',      'COPD'),
+  ('P005', 'Emery Synth',   DATE'1972-09-09', '900-02-2001', 'OGDEN',    'Asthma'),
+  ('P006', 'Finley Synth',  DATE'1980-04-17', '900-02-2002', 'OGDEN',    'Hyperlipidemia'),
+  ('P007', 'Gray Synth',    DATE'1966-12-01', '900-02-2003', 'OGDEN',    'Chronic kidney disease'),
+  ('P008', 'Harper Synth',  DATE'1990-06-25', '900-03-3001', 'PROVO',    'Migraine'),
+  ('P009', 'Indy Synth',    DATE'1985-02-11', '900-03-3002', 'PROVO',    'Atrial fibrillation'),
+  ('P010', 'Jordan Synth',  DATE'1977-08-19', '900-03-3003', 'PROVO',    'Osteoarthritis'),
+  ('P011', 'Kai Synth',     DATE'1969-10-08', '900-04-4001', 'STGEORGE', 'Hypothyroidism'),
+  ('P012', 'Logan Synth',   DATE'1993-05-03', '900-04-4002', 'STGEORGE', 'Depression');
+
+-- Row filter: PHI-full sees all, analysts see all (masked), SLC clinicians see SLC only.
+CREATE OR REPLACE FUNCTION fac_filter(facility STRING)
+RETURN is_account_group_member('${phi_full}')
+    OR is_account_group_member('${analyst}')
+    OR (facility = 'SLC' AND is_account_group_member('${clinician_slc}'));
+
+CREATE OR REPLACE FUNCTION mask_ssn(ssn STRING)
+RETURN CASE WHEN is_account_group_member('${phi_full}') THEN ssn
+            ELSE CONCAT('***-**-', RIGHT(ssn, 4)) END;
+
+CREATE OR REPLACE FUNCTION mask_name(name STRING)
+RETURN CASE WHEN is_account_group_member('${phi_full}') OR is_account_group_member('${clinician_slc}') THEN name
+            ELSE 'REDACTED' END;
+
+ALTER TABLE patients SET ROW FILTER fac_filter ON (facility);
+ALTER TABLE patients ALTER COLUMN ssn  SET MASK mask_ssn;
+ALTER TABLE patients ALTER COLUMN name SET MASK mask_name;
+
+-- Exposed as an MCP tool by /api/2.0/mcp/functions/${catalog}/${schema}. Runs as the caller, so filters and masks apply.
+CREATE OR REPLACE FUNCTION get_patients(fac STRING DEFAULT NULL COMMENT 'Facility code, e.g. SLC. NULL = all facilities the caller may see.')
+RETURNS TABLE (patient_id STRING, name STRING, ssn STRING, facility STRING, diagnosis STRING)
+COMMENT 'Patients visible to the caller under Unity Catalog row filters and column masks.'
+RETURN
+  SELECT patient_id, name, ssn, facility, diagnosis
+  FROM ${catalog}.${schema}.patients
+  WHERE fac IS NULL OR facility = upper(fac);
+
+-- Row cap enforced inside Unity Catalog (defense in depth with the APIM /uc-limited row cap).
+-- Whatever the agent asks for, at most 10 rows come back; default 5.
+CREATE OR REPLACE FUNCTION get_patients_limited(
+  fac      STRING DEFAULT NULL COMMENT 'Facility code, e.g. SLC. NULL = all facilities the caller may see.',
+  max_rows INT    DEFAULT 5    COMMENT 'Rows to return (1-10). Larger values are capped at 10.')
+RETURNS TABLE (patient_id STRING, name STRING, ssn STRING, facility STRING, diagnosis STRING)
+COMMENT 'Like get_patients, but Unity Catalog caps the result at 10 rows. Filters and masks still apply.'
+RETURN
+  SELECT patient_id, name, ssn, facility, diagnosis
+  FROM (
+    SELECT patient_id, name, ssn, facility, diagnosis,
+           row_number() OVER (ORDER BY patient_id) AS rn
+    FROM ${catalog}.${schema}.patients
+    WHERE fac IS NULL OR facility = upper(fac)
+  )
+  -- Filter in WHERE: Databricks cannot resolve function parameters inside QUALIFY.
+  WHERE rn <= least(greatest(coalesce(max_rows, 5), 1), 10);

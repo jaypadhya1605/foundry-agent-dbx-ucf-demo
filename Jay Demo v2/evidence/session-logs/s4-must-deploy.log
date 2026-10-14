@@ -1,0 +1,108 @@
+bearer line check:
+            "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+        auth_headers = {"Authorization": f"Bearer {entra_token(a.auth, a.audience)}"}
+=== build ===
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+main build exit 0
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+runtime build exit 0
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+params build exit 0
+=== size probe on /uc (before deploy) ===
+SLC output chars: 762
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc/mcp auth=key
+# initialize: HTTP 200, correlation id eac4936c-02bd-4fc0-b2cf-6f03e47946d2
+# notifications/initialized: HTTP 200, correlation id 2a24339e-aac5-4977-9b41-cb147de844bd
+# tools/list: HTTP 200, correlation id 23614ccb-bba0-4318-86b2-a03558e754e9
+# tools: ['imh_demo__clinical__get_patients']
+# tools/call: HTTP 200, correlation id 912fd431-1fec-4d21-9e71-6598c5d778d6
+{"is_truncated":false,"columns":["patient_id","name","ssn","facility","diagnosis"],"rows":[["P001","REDACTED","***-**-1001","SLC","Type 2 diabetes"],["P002","REDACTED","***-**-1002","SLC","Hypertension"],["P003","REDACTED","***-**-1003","SLC","Congestive heart failure"],["P004","REDACTED","***-**-1004","SLC","COPD"]]}
+
+null-fac output chars: 1280
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc/mcp auth=key
+# initialize: HTTP 200, correlation id fc1b713a-c4c6-4259-afa7-33e3fdb8ca39
+# notifications/initialized: HTTP 200, correlation id 12c42361-db2d-4c95-b87b-3a10ab02b927
+# tools/list: HTTP 200, correlation id 50e5d160-d338-4623-8d83-32fdb977875e
+# tools: ['imh_demo__clinical__get_patients']
+# tools/call: HTTP 200, correlation id ec2cd03c-ee6b-475d-bea9-091723f11acd
+{"is_truncated":false,"columns":["patient_id","name","ssn","facility","diagnosis"],"rows":[["P001","REDACTED","***-**-1001","SLC","Type 2 diabetes"],["P002","REDACTED","***-**-1002","SLC","Hypertension"],["P003","REDACTED","***-**-1003","SLC","Congestive heart failure"],["P004","REDACTED","***-**-1004","SLC","COPD"],["P005","REDACTED","***-**-2005","OGDEN","Asthma"],["P006","REDACTED","***-**-2006","OGDEN","Chronic kidney disease stage 3"],["P007","REDACTED","***-**-2007","OGDEN","Atrial fibrillation"],["P008","REDACTED","***-**-3008","PROVO","Community-acquired pneumonia"],["P009","REDACTED","***-**-3009","PROVO","Major depressive disorder"],["P010","REDACTED","***-**-3010","PROVO","Osteoarthritis of knee"],["P011","REDACTED","***-**-4011","STGEORGE","Migraine"],["P012","REDACTED","***-**-4012","STGEORGE","Hyperlipidemia"]]}
+
+=== deploy ===
+Account: jaypadhya@microsoft.com	Azure-brakekat
+Registering resource providers (one-time)...
+  Microsoft.ApiManagement registered
+  Microsoft.ManagedIdentity registered
+  Microsoft.OperationalInsights registered
+  Microsoft.Insights registered
+Building Bicep...
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+Deploying (APIM BasicV2 typically takes 5-15 min)...
+WARNING: A new Bicep release is available: v0.48.1. Upgrade now by running "az bicep upgrade".
+{
+  "apimName": "apim-imh-uc-66zpmtcbvhe7w",
+  "entraAudience": "e983157d-68fc-430a-9ee8-cdf1efe4b68e",
+  "entraMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-entra/mcp",
+  "foundryConnectionNames": [
+    "uc-fn-via-apim-umi-iac",
+    "genie-via-apim-umi-iac",
+    "uc-limited-via-apim-umi-iac",
+    ""
+  ],
+  "genieMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/genie/mcp",
+  "limitedMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp",
+  "logAnalyticsWorkspace": "law-imh-uc-66zpmtcbvhe7w",
+  "mcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc/mcp",
+  "modelGatewayUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/aoai",
+  "runtimeUmiClientId": "dbd7f6a1-92a8-470b-a7bd-7bf2f947b6a7",
+  "runtimeUmiName": "umi-imh-uc-runtime",
+  "umiClientId": "e983157d-68fc-430a-9ee8-cdf1efe4b68e",
+  "umiName": "umi-imh-uc-agent",
+  "umiPrincipalId": "a256535e-6537-4efd-b633-8e809ce37142"
+}
+DEPLOY-COMPLETE
+=== /uc-limited tests ===
+--- T1 SLC (expect rows) ---
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp auth=key
+# initialize: HTTP 200, correlation id 3fab31f2-4f1c-4bd3-8cd8-3e379afedf08
+# notifications/initialized: HTTP 200, correlation id 3182acb4-1077-4de7-9934-2cc7f41999a1
+# tools/list: HTTP 200, correlation id 14ab0425-1837-429a-a856-559296057450
+# tools: ['imh_demo__clinical__get_patients']
+# tools/call: HTTP 200, correlation id f860b26e-7266-4a1f-b791-370fb95725c8
+{"is_truncated":false,"columns":["patient_id","name","ssn","facility","diagnosis"],"rows":[["P001","REDACTED","***-**-1001","SLC","Type 2 diabetes"],["P002","REDACTED","***-**-1002","SLC","Hypertension"],["P003","REDACTED","***-**-1003","SLC","Congestive heart failure"],["P004","REDACTED","***-**-1004","SLC","COPD"]]}
+--- T2 all facilities (expect size block) ---
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp auth=key
+# initialize: HTTP 200, correlation id 28641f0a-44dd-4f9c-8831-080fd5cd1573
+# notifications/initialized: HTTP 200, correlation id 76727d41-3924-46fb-a8f7-e5dcf4212bf4
+# tools/list: HTTP 200, correlation id 2873bb23-addb-4feb-b780-c0cd1156c4db
+# tools: ['imh_demo__clinical__get_patients']
+# tools/call: HTTP 200, correlation id e78de171-71b7-435c-91d6-698fcbb57a50, gateway block: row-limit 12>5
+Blocked by gateway policy: the result has 12 rows (limit 5) or is larger than 20000 bytes. Ask a narrower question, for example one facility.
+--- T3 repeat 5 (expect 429 after 3 tool calls/min; T1+T2 already used 2) ---
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp auth=key
+# initialize: HTTP 200, correlation id ba6f5a63-6384-424b-989e-4cb2fa2276a4
+# notifications/initialized: HTTP 200, correlation id 20661a72-e37c-4701-a23e-9b8e1af7a8ca
+# tools/list: HTTP 200, correlation id 285cf734-df4f-472a-bea8-3fb19a932718
+# tools: ['imh_demo__clinical__get_patients']
+# call 1/5
+# tools/call: HTTP 200, correlation id 25430e7e-01b5-4aa9-a673-7a7670771bd9
+{"is_truncated":false,"columns":["patient_id","name","ssn","facility","diagnosis"],"rows":[["P001","REDACTED","***-**-1001","SLC","Type 2 diabetes"],["P002","REDACTED","***-**-1002","SLC","Hypertension"],["P003","REDACTED","***-**-1003","SLC","Congestive heart failure"],["P004","REDACTED","***-**-1004","SLC","COPD"]]}
+# call 2/5
+# tools/call: HTTP 200, correlation id 6739372b-9b10-451a-922f-908adb7d1e32
+{"is_truncated":false,"columns":["patient_id","name","ssn","facility","diagnosis"],"rows":[["P001","REDACTED","***-**-1001","SLC","Type 2 diabetes"],["P002","REDACTED","***-**-1002","SLC","Hypertension"],["P003","REDACTED","***-**-1003","SLC","Congestive heart failure"],["P004","REDACTED","***-**-1004","SLC","COPD"]]}
+# call 3/5
+# gateway refused the call: HTTP 429 Too Many Requests: { "statusCode": 429, "message": "Rate limit is exceeded. Try again in 8 seconds." } (retry after 8s)
+# call 4/5
+# gateway refused the call: HTTP 429 Too Many Requests: { "statusCode": 429, "message": "Rate limit is exceeded. Try again in 7 seconds." } (retry after 7s)
+# call 5/5
+# gateway refused the call: HTTP 429 Too Many Requests: { "statusCode": 429, "message": "Rate limit is exceeded. Try again in 6 seconds." } (retry after 6s)
+=== /uc-entra negative tests ===
+--- E1 ARM token (wrong audience, expect 401) ---
+# url=https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-entra/mcp auth=azcli
+# gateway refused the request: HTTP 401 Unauthorized: { "statusCode": 401, "message": "A valid Entra token for the UC agent gateway is required." }
+--- E2 az cli token for gateway audience (expect consent error or 401: client not allowed) ---
+audience=e983157d-68fc-430a-9ee8-cdf1efe4b68e
+# az could not get a token for e983157d-68fc-430a-9ee8-cdf1efe4b68e: ERROR: V2Error: invalid_request AADSTS100040: AppId: '04b07795-8ddb-461a-bbee-02f9e1bf7b46' can not use Managed Service Identity (MSI) as audience in token as it is unsupported. MSI should not be set as audience as it does not accept tokens. Trace ID: 7f84783f-62cc-4484-8af2-22c34be10001 Correlation ID: 3ced4041-c9b0-4126-b6b7-436bdf21dde5 Timestamp: 2026-10-13 02:45:11Z. Status: Response_Status.S
+=== /aoai test ===
+status 200 remaining-tokens 19985
+gateway ok
+S4-DONE

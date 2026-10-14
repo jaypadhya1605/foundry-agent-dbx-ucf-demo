@@ -1,0 +1,21 @@
+{
+  "apimName": "apim-imh-uc-66zpmtcbvhe7w",
+  "entraAudience": "https://management.azure.com",
+  "entraMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-entra/mcp",
+  "foundryConnectionNames": [
+    "uc-fn-via-apim-umi-iac",
+    "genie-via-apim-umi-iac",
+    "uc-limited-via-apim-umi-iac",
+    ""
+  ],
+  "genieMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/genie/mcp",
+  "limitedMcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc-limited/mcp",
+  "logAnalyticsWorkspace": "law-imh-uc-66zpmtcbvhe7w",
+  "mcpUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/uc/mcp",
+  "modelGatewayUrl": "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/aoai",
+  "runtimeUmiClientId": "dbd7f6a1-92a8-470b-a7bd-7bf2f947b6a7",
+  "runtimeUmiName": "umi-imh-uc-runtime",
+  "umiClientId": "e983157d-68fc-430a-9ee8-cdf1efe4b68e",
+  "umiName": "umi-imh-uc-agent",
+  "umiPrincipalId": "a256535e-6537-4efd-b633-8e809ce37142"
+}

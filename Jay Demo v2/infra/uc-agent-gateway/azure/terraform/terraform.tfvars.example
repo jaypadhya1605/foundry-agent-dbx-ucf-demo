@@ -1,0 +1,32 @@
+# BrakeKat demo values. Copy to terraform.tfvars (git-ignored) and adjust per environment.
+subscription_id     = "9bbee190-dc61-4c58-ab47-1275cb04018f"
+resource_group_name = "rg-ai"
+location            = "westus3"
+prefix              = "imh-uc"
+name_suffix         = "66zpmtcbvhe7w" # matches the Bicep-built stack so it can be imported
+publisher_email     = "jay@brakekat.com"
+publisher_name      = "IMH UC demo (synthetic)"
+databricks_host     = "adb-2813105879250022.2.azuredatabricks.net"
+uc_catalog          = "imh_demo"
+uc_schema           = "clinical"
+genie_space_id      = "01f1c5e2508a1326a03ad64e4d7fb1b5"
+calls_per_minute    = 30
+apim_sku            = "BasicV2_1"
+foundry_project_id  = "/subscriptions/9bbee190-dc61-4c58-ab47-1275cb04018f/resourceGroups/rg-ai/providers/Microsoft.CognitiveServices/accounts/aif-wu3/projects/proj-imh-uc-demo"
+
+# Row/size cap (/uc-limited/mcp)
+enable_limited_api            = true
+limited_tool_calls_per_minute = 3
+limited_daily_quota           = 200
+limited_max_rows              = 5
+
+# Entra token validation (/uc-entra/mcp). At IMH: gateway_audience = "api://<gateway appId>"
+enable_entra_api = true
+gateway_audience = ""
+
+# Databricks AI Gateway -> APIM -> Foundry model (/aoai)
+model_account_id        = "/subscriptions/9bbee190-dc61-4c58-ab47-1275cb04018f/resourceGroups/rg-ai/providers/Microsoft.CognitiveServices/accounts/aif-wu3"
+model_tokens_per_minute = 20000
+
+# Container Apps job runtime (stands in for AKS)
+enable_runtime = true

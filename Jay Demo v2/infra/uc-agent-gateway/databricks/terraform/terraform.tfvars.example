@@ -1,0 +1,20 @@
+# BrakeKat demo values. Copy to terraform.tfvars (git-ignored).
+account_id       = "082cbe91-b8ca-4ac2-bae1-28b83b85267e"
+databricks_host  = "adb-2813105879250022.2.azuredatabricks.net"
+workspace_id     = 2813105879250022
+umi_client_id    = "e983157d-68fc-430a-9ee8-cdf1efe4b68e"
+umi_display_name = "umi-imh-uc-agent"
+agent_group_key  = "analyst"
+create_groups    = true
+uc_catalog       = "imh_demo"
+uc_schema        = "clinical"
+create_catalog   = false # created in the UI on external location adb_rjb_wu3 (metastore has no root)
+warehouse_id     = "<adb-demo-wh warehouse id>"
+
+manage_warehouse_permissions = false # shared warehouse: grant Can use in the UI
+deploy_uc_objects            = false # live demo table already exists; true only for a fresh workspace
+create_oauth_app             = false # portal-made foundry-genie-imh-uc already exists
+
+# Databricks -> APIM -> Foundry model. Key: $env:TF_VAR_apim_model_key = az rest ... databricks-ai-gateway/listSecrets
+apim_model_gateway_url = "https://apim-imh-uc-66zpmtcbvhe7w.azure-api.net/aoai"
+model_deployment       = "gpt-4.1"

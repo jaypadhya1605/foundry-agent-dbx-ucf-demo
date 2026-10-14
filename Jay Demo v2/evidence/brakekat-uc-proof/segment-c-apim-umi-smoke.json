@@ -1,0 +1,35 @@
+{
+  "proof": "Segment C - APIM with managed identity (agent identity) -> Databricks UC functions MCP",
+  "status": "PASSED",
+  "runAt": "2026-10-12T16:41-04:00",
+  "tenant": "BrakeKat Studios (8d038e6a-9b7d-4cb8-bbcf-e84dff156478)",
+  "subscription": "9bbee190-dc61-4c58-ab47-1275cb04018f / rg-ai",
+  "network": "public endpoints",
+  "data": "synthetic",
+  "chain": "client -> APIM apim-imh-uc-66zpmtcbvhe7w (/uc/mcp, subscription key) -> authentication-managed-identity umi-imh-uc-agent -> https://adb-2813105879250022.2.azuredatabricks.net/api/2.0/mcp/functions/imh_demo/clinical -> get_patients -> imh_demo.clinical.patients",
+  "identity": {
+    "managedIdentity": "umi-imh-uc-agent",
+    "clientId": "e983157d-68fc-430a-9ee8-cdf1efe4b68e",
+    "databricksServicePrincipal": "umi-imh-uc-agent (source External, auto-synced from Entra)",
+    "ucGroup": "imh_analyst",
+    "workspacePermission": "User"
+  },
+  "beforeRegistration": "initialize/tools/list/tools/call -> HTTP 403 'User not authorized' (token valid, identity unknown to Databricks)",
+  "afterRegistration": {
+    "initialize": { "http": 200, "correlationId": "d0b8e190-a5d2-4684-bb1b-948b30b3587d", "server": "DatabricksMCPServer 0.1.0" },
+    "toolsList": { "http": 200, "correlationId": "a268a3f9-f5ef-4afc-8b26-038b77bef10a", "tools": ["imh_demo__clinical__get_patients"] },
+    "toolsCall": {
+      "http": 200,
+      "correlationId": "0a7bc8e5-8566-4063-8f99-9b41c95bfed7",
+      "arguments": { "fac": "SLC" },
+      "rows": [
+        ["P001", "REDACTED", "***-**-1001", "SLC", "Type 2 diabetes"],
+        ["P002", "REDACTED", "***-**-1002", "SLC", "Hypertension"],
+        ["P003", "REDACTED", "***-**-1003", "SLC", "Congestive heart failure"],
+        ["P004", "REDACTED", "***-**-1004", "SLC", "COPD"]
+      ]
+    }
+  },
+  "conclusion": "UC enforced imh_analyst masks on the APIM managed identity. No user token, no client secret, no External Data Access dependency in the call path (EDA toggle test still pending).",
+  "iac": ["infra/brakekat-apim-umi.bicep", "infra/Deploy-BrakekatApimUmi.ps1", "infra/Test-BrakekatApimUmi.ps1"]
+}

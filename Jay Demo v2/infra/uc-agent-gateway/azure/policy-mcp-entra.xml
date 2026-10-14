@@ -1,0 +1,28 @@
+<policies>
+  <!-- MCP API, no key: APIM validates the caller's Entra token (tenant, audience, allowed client app IDs).
+       Tokens: TENANT AUDIENCES CLIENTS CALLS REWRITE RESOURCE CLIENT_ID (each wrapped in double underscores) -->
+  <inbound>
+    <base />
+    <validate-azure-ad-token tenant-id="__TENANT__" header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="A valid Entra token for the UC agent gateway is required." output-token-variable-name="callerJwt">
+      <client-application-ids>__CLIENTS__</client-application-ids>
+      <audiences>__AUDIENCES__</audiences>
+    </validate-azure-ad-token>
+    <set-variable name="callerAppId" value="@(((Jwt)context.Variables["callerJwt"]).Claims.GetValueOrDefault("appid", ((Jwt)context.Variables["callerJwt"]).Claims.GetValueOrDefault("azp", "unknown")))" />
+    <rate-limit-by-key calls="__CALLS__" renewal-period="60" counter-key="@((string)context.Variables["callerAppId"])" />
+    <set-header name="x-imh-caller-appid" exists-action="override"><value>@((string)context.Variables["callerAppId"])</value></set-header>
+    <set-variable name="correlationId" value="@(context.RequestId.ToString())" />
+    <set-header name="x-imh-correlation-id" exists-action="override"><value>@((string)context.Variables["correlationId"])</value></set-header>
+    <set-header name="Authorization" exists-action="delete" />
+    <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+    <rewrite-uri template="__REWRITE__" copy-unmatched-params="false" />
+    <authentication-managed-identity resource="__RESOURCE__" client-id="__CLIENT_ID__" ignore-error="false" />
+  </inbound>
+  <backend><forward-request timeout="120" buffer-response="false" /></backend>
+  <outbound>
+    <set-header name="x-imh-correlation-id" exists-action="override"><value>@((string)context.Variables["correlationId"])</value></set-header>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>
